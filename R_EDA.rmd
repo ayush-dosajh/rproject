@@ -1,0 +1,432 @@
+Greenhouse Gas Emmision (India) by Ayush
+========================================================
+
+> Resources -  
+http://datasets.wri.org/dataset/cait-country (for data set)
+
+> **Tip**: One of the requirements of this project is that your code follows
+good formatting techniques, including limiting your lines to 80 characters or
+less. If you're using RStudio, go into Preferences \> Code \> Display to set up
+a margin line to help you keep track of this guideline!
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using in your analysis in this code
+# chunk.
+
+# install these if necessary
+#install.packages('GGally')
+#install.packages('scales')
+#install.packages('memisc')
+#install.packages('lattice')
+#install.packages('MASS')
+#install.packages('car')
+#install.packages('reshape')
+#install.packages('plyr')
+#install.packages('RColorBrewer', dependencies = TRUE)
+
+
+# load the ggplot graphics package and the others
+library(RColorBrewer)
+library(ggplot2)
+library(GGally)
+library(scales)
+library(memisc)
+library(gridExtra)
+library(tseries)
+library(forecast)
+
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk. This
+# prevents the code from displaying in the knitted HTML output. You should set
+# echo=FALSE for all code chunks in your file, unless it makes sense for your
+# report to show the code that generated a particular plot.
+
+# The other parameters for "message" and "warning" should also be set to FALSE
+# for other code chunks once you have verified that each plot comes out as you
+# want it to. This will clean up the flow of your report.
+
+
+```
+
+```{r echo=FALSE, Load_the_Data}
+# Load the Data
+
+getwd()
+
+ghg <- read.csv("GHG.csv" , sep = ",")
+
+summary(ghg)
+
+```
+
+> CAIT data set of global Green house gas emmision is acquired from - 
+http://datasets.wri.org/dataset/cait-country .The CAIT Country GHG emissions collection applies a consistent methodology to create a six-gas, multi-sector, and internationally comparable data set for 186 countries.
+
+
+# Univariate Plots Section
+
+> **Tip**: In this section, you should perform some preliminary exploration of
+your dataset. Run some summaries of the data and create univariate plots to
+understand the structure of the individual variables in your dataset. Don't
+forget to add a comment after each plot or closely-related group of plots!
+There should be multiple code chunks and text sections; the first one below is
+just to help you get started.
+
+```{r echo=FALSE, Univariate_Plots}
+names(ghg)
+# A simple histogram dipicting TotalGHG distribution (it shows that most of the countries over the year has very less emmision also that there are more emission by certain coutries over the year other than this not much can be drawn out) 
+qplot(x=TotalGHG ,data = ghg ) +
+  scale_x_continuous(limits = c(0,1000) , breaks = seq(0,1000,100)) +
+  scale_y_sqrt()
+
+
+#produces histograms of count(here no. countries with GHG Emmision for each year seperatly)
+qplot(x=TotalGHG,data = ghg ,ylab = 'NumberOfCountries', color = I('cyan') , fill= I('green')  )+
+  scale_x_continuous(limits = c(100,1000) , breaks = seq(100,1000,100))+
+  facet_wrap(~Year)
+
+qplot(x=TotalCH4 , data = ghg ,ylab = 'NumberOfCountries'  )+
+  scale_x_continuous(limits = c(100,1000) , breaks = seq(100,1000,100))+
+  facet_wrap(~Year)
+#log trans for normal distribution
+qplot(x=TotalGHG ,data = ghg , color = I('cyan') , fill= I('red') ) +
+  scale_x_continuous(limits = c(0,1000) , breaks = seq(0,1000,100))+
+  scale_x_log10()
+  
+
+#summary(ghg$Industrial.Processes..MtCO2e.)
+qplot(x= Industrial ,data = ghg , color = I('cyan') , fill= I('red') ) +
+  scale_x_continuous(limits = c(0,400) , breaks = seq(0,400,400))+
+  scale_y_continuous(limits = c(0,20) , breaks = seq(0,50,10)) +
+  facet_grid(~Year , space ='free_x' , scales = 'free_x')
+
+
+# GHG PRODUCTION FROM DIFFRENT SOURCES and plotting side by side using grid arrange
+
+p1 <-qplot(x= Industrial ,data = ghg 
+           , color = I('cyan') , fill= I('red') ) +
+  scale_x_continuous(limits = c(0,400) , breaks = seq(0,500,200))+
+  scale_y_continuous(limits = c(0,20) , breaks = seq(0,50,10)) 
+
+p2 <-qplot(x= Transportation ,data = ghg , 
+           color = I('cyan') , fill= I('red') ) +
+  scale_x_continuous(limits = c(0,400) , breaks = seq(0,500,200))+
+  scale_y_continuous(limits = c(0,20) , breaks = seq(0,50,10)) 
+
+p3<- qplot(x= Waste ,data = ghg , 
+           color = I('cyan') , fill= I('red') ) +
+  scale_x_continuous(limits = c(0,250) , breaks = seq(0,500,200))+
+  scale_y_continuous(limits = c(0,20) , breaks = seq(0,50,10)) 
+
+p4<- qplot(x= Land.Use ,data = ghg , 
+           color = I('cyan') , fill= I('red') ) +
+  scale_x_continuous(limits = c(0,300) , breaks = seq(0,500,200))+
+  scale_y_continuous(limits = c(0,20) , breaks = seq(0,50,10)) 
+
+p5<- qplot(x= FugitiveEmissions ,data = ghg , 
+           color = I('cyan') , fill= I('red') ) +
+  scale_x_continuous(limits = c(0,400) , breaks = seq(0,500,200))+
+  scale_y_continuous(limits = c(0,20) , breaks = seq(0,50,10)) 
+
+grid.arrange(p1,p2,p3,p4,p5 , ncol=2)
+names(ghg)
+
+
+
+
+
+
+```
+
+> **Tip**: Make sure that you leave a blank line between the start / end of
+each code block and the end / start of your Markdown text so that it is
+formatted nicely in the knitted text. Note as well that text on consecutive
+lines is treated as a single space. Make sure you have a blank line between
+your paragraphs so that they too are formatted for easy readability.
+
+# Univariate Analysis
+
+> **Tip**: Now that you've completed your univariate explorations, it's time to
+reflect on and summarize what you've found. Use the questions below to help you
+gather your observations and add your own if you have other thoughts!
+
+### What is the structure of your dataset?
+The data set contains 4324 obs over 22 variables . Dataset gives info of majoe green house gasses and thier sources . 
+
+### What is/are the main feature(s) of interest in your dataset?
+The sources as well as the the total emmisions are given and hence contribution of each sector on total emmision.
+
+### What other features in the dataset do you think will help support your \
+investigation into your feature(s) of interest?
+
+### Did you create any new variables from existing variables in the dataset?
+No 
+### Of the features you investigated, were there any unusual distributions? \
+Did you perform any operations on the data to tidy, adjust, or change the form \
+of the data? If so, why did you do this?
+No changes  were done to the data as it was clean and ready to use
+
+
+# Bivariate Plots Section
+
+> **Tip**: Based on what you saw in the univariate plots, what relationships
+between variables might be interesting to look at in this section? Don't limit
+yourself to relationships between a main output feature and one of the
+supporting variables. Try to look at relationships between supporting variables
+as well.
+
+```{r echo=FALSE, Bivariate_Plots}
+names(ghg)
+color.sub<- c( 'China' , 'Japan' , 'Bangladesh' , 'Pakistan' , 'India' , 'Afghanistan')
+color.sub2<- c( 'China' , 'India' )
+ghg1 <- subset (ghg, (ghg$Country == 'India' | ghg$Country == 'China' | ghg$Country == 'Japan'))
+
+
+ggplot(aes(x=Total.CO2.land , y=TotalGHG ), data = ghg) +
+  geom_line()
+
+#PLOTTING ALL THE GASSES COUNTRY WISE USING GRIDEXTRA.gridarrange
+
+px <- ggplot(aes(x=Year , y= TotalGHG ,color = Country ),
+             data = ghg1) +
+  geom_line()+ ylab('totalGHG')
+
+
+
+py <- ggplot(aes(x=Year , y= Total.CO2.land ,
+                 color = Country ), data = ghg1) +
+  geom_line()+
+  ylab('CO2')
+
+pz <- ggplot(aes(x=Year , y= TotalCH4 ,color = Country ),
+             data = ghg1) +geom_line()+ ylab('CH4')
+
+pa <- ggplot(aes(x=Year , y= TotalN2O ,color = Country ), 
+             data = ghg1) +geom_line()+ ylab('N20')
+
+grid.arrange(px,py,pz,pa ,ncol=1)
+
+# ggpairs of selected country data only to display scatterplot matrix
+suppressWarnings(ggpairs(ghg1 , cardinality_threshold = 188))
+
+
+
+
+
+
+
+
+```
+
+```{r echo=False}
+
+
+
+
+```
+
+
+# Bivariate Analysis
+
+> **Tip**: As before, summarize what you found in your bivariate explorations
+here. Use the questions below to guide your discussion.
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. How did the feature(s) of interest vary with other features in \
+the dataset?
+
+### Did you observe any interesting relationships between the other features \
+(not the main feature(s) of interest)?
+
+### What was the strongest relationship you found?
+
+
+# Multivariate Plots Section
+
+> **Tip**: Now it's time to put everything together. Based on what you found in
+the bivariate plots section, create a few multivariate plots to investigate
+more complex interactions between variables. Make sure that the plots that you
+create here are justified by the plots you explored in the previous section. If
+you plan on creating any mathematical models, this is the section where you
+will do that.
+
+```{r echo=FALSE, Multivariate_Plots}
+
+```
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. Were there features that strengthened each other in terms of \
+looking at your feature(s) of interest?
+
+### Were there any interesting or surprising interactions between features?
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the \
+strengths and limitations of your model.
+
+------
+
+# Final Plots and Summary
+
+> **Tip**: You've done a lot of exploration and have built up an understanding
+of the structure of and relationships between the variables in your dataset.
+Here, you will select three plots from all of your previous exploration to
+present here as a summary of some of your most interesting findings. Make sure
+that you have refined your selected plots for good titling, axis labels (with
+units), and good aesthetic choices (e.g. color, transparency). After each plot,
+make sure you justify why you chose each plot by describing what it shows.
+
+### Plot One
+```{r echo=FALSE, Plot_One}
+
+```
+
+### Description One
+
+
+### Plot Two
+```{r echo=FALSE, Plot_Two}
+
+```
+
+### Description Two
+
+
+### Plot Three
+```{r echo=FALSE, Plot_Three}
+
+```
+
+### Description Three
+
+------
+#MODELING USING ARIMA MODEL
+```{r echo = FALSE , model_arima}
+#Arima time series
+sub1 <-subset(ghg,ghg$Country == 'India' )
+subt <- subset(sub1,select = c( 'Year' ) )
+sub <- ts(subset(sub1,select = c('TotalGHG'  ) ))
+
+
+subt$cleanTghg <- tsclean(sub)
+
+ggplot() +
+  geom_line(data = subt, aes(x = Year, y = cleanTghg)) + ylab('Cleaned TOTAL GHG')
+
+
+
+
+
+
+
+```
+
+###Calculating moving averages and ploting it
+
+```{r echo=FALSE}
+
+
+subt$ghg_ma5 <- ma(subt$cleanTghg, order=5) #ma= moving average   5 years
+subt$ghg_ma10 <- ma(subt$cleanTghg, order=10)# ma  decade
+summary(subt$ghg_ma5)
+summary(subt$ghg_ma10)
+ggplot() +
+  geom_line(data = subt, aes(x = Year, y =cleanTghg , colour = "Totalghg")) +
+  geom_line(data = subt, aes(x = Year, y = subt$ghg_ma5,   colour = "Moving Average for 5 years"))  +
+  geom_line(data = subt, aes(x = Year, y = subt$ghg_ma5, colour = " Moving Average for 10 years"))  +
+  ylab('GHG ')  #not much variation is seen here
+#DECOMPOSITION
+#TREND THE GHG emmision follows a increasing pattern overtime
+#Seasonality yearly data no seasonality here  
+#finding residua/error
+
+```
+### Not much variation is seen here
+
+### DECOMPOSITION
+
+### TREND THE GHG emmision follows a increasing pattern overtime
+
+### Seasonality yearly data no seasonality here  
+
+
+```{r echo = TRUE}
+tghg_ma <- ts(na.omit(subt$ghg_ma5), frequency=5) 
+#taking 5 years as a frequeny and will build model around it
+
+decomp = stl(tghg_ma, s.window="periodic" ,)
+deseasonal_ghg <- seasadj(decomp)
+plot(decomp)
+
+#trend could easily be seen almost not too much noise 
+
+
+#Arima model requires a stationary series
+
+adf.test(tghg_ma, alternative = "stationary")
+
+#Autocorrelation plots for chosing Arima parametres
+
+Acf(tghg_ma, main='')
+
+Pacf(tghg_ma, main='')
+
+ 
+
+
+```
+
+
+### Creating models to find best fit
+
+```{r echo =TRUE}
+m1 <- auto.arima(deseasonal_ghg, seasonal=FALSE)
+m1
+#model is ok because no major corelation can be seen from ACF andPACF checking for '6'
+tsdisplay(residuals(m1), lag.max=10, main='(0,2,0) Model Residuals') 
+
+
+m2 <- arima(deseasonal_ghg, order=c(1,1,6))
+
+m2
+
+tsdisplay(residuals(m2), lag.max=10, main='Seasonal Model Residuals')
+#m2 model with  6 is better and shows no correlation
+
+fcast <- forecast(m2, h=15)
+plot(fcast)
+```
+
+###  HOLDING VALUES AND INTRODUCING SEASONALITY
+
+```{r echo=FALSE}
+
+hold <- window(ts(deseasonal_ghg), start=1990)
+deseasonal_ghg
+hold
+fit_holdout <- arima(ts(deseasonal_ghg[-c(700:725)]), order=c(1,1,7))
+
+fcast_holdout <- forecast(fit_holdout,h=15)
+
+fcast_holdout
+plot(x=fcast_holdout, main=" ")
+
+
+fit_seasonality = auto.arima(deseasonal_ghg, seasonal=TRUE)
+fit_seasonality
+fcast_s <- forecast(fit_seasonality, h=20)
+plot(fcast_s)
+
+```
+
+
+# Reflection
+
+> **Tip**: Here's the final step! Reflect on the exploration you performed and
+the insights you found. What were some of the struggles that you went through?
+What went well? What was surprising? Make sure you include an insight into
+future work that could be done with the dataset.
+
+> **Tip**: Don't forget to remove this, and the other **Tip** sections before
+saving your final work and knitting the final report!
