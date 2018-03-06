@@ -1,13 +1,10 @@
-Greenhouse Gas Emmision (India) by Ayush
+Greenhouse Gas Emmision (India)
+by Ayush Dosajh
 ========================================================
 
 > Resources -  
 http://datasets.wri.org/dataset/cait-country (for data set)
-
-> **Tip**: One of the requirements of this project is that your code follows
-good formatting techniques, including limiting your lines to 80 characters or
-less. If you're using RStudio, go into Preferences \> Code \> Display to set up
-a margin line to help you keep track of this guideline!
+www.datascience.com
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
 # Load all of the packages that you end up using in your analysis in this code
@@ -34,24 +31,19 @@ library(memisc)
 library(gridExtra)
 library(tseries)
 library(forecast)
+library(reshape2)
+library(dplyr)
 
 
-# Notice that the parameter "echo" was set to FALSE for this code chunk. This
-# prevents the code from displaying in the knitted HTML output. You should set
-# echo=FALSE for all code chunks in your file, unless it makes sense for your
-# report to show the code that generated a particular plot.
-
-# The other parameters for "message" and "warning" should also be set to FALSE
-# for other code chunks once you have verified that each plot comes out as you
-# want it to. This will clean up the flow of your report.
 
 
 ```
 
+>Data overveiw/ summary
+
 ```{r echo=FALSE, Load_the_Data}
 # Load the Data
 
-getwd()
 
 ghg <- read.csv("GHG.csv" , sep = ",")
 
@@ -59,18 +51,16 @@ summary(ghg)
 
 ```
 
+
+
+
 > CAIT data set of global Green house gas emmision is acquired from - 
 http://datasets.wri.org/dataset/cait-country .The CAIT Country GHG emissions collection applies a consistent methodology to create a six-gas, multi-sector, and internationally comparable data set for 186 countries.
 
 
 # Univariate Plots Section
 
-> **Tip**: In this section, you should perform some preliminary exploration of
-your dataset. Run some summaries of the data and create univariate plots to
-understand the structure of the individual variables in your dataset. Don't
-forget to add a comment after each plot or closely-related group of plots!
-There should be multiple code chunks and text sections; the first one below is
-just to help you get started.
+> All the univariate plots are here.
 
 ```{r echo=FALSE, Univariate_Plots}
 names(ghg)
@@ -129,7 +119,6 @@ p5<- qplot(x= FugitiveEmissions ,data = ghg ,
   scale_y_continuous(limits = c(0,20) , breaks = seq(0,50,10)) 
 
 grid.arrange(p1,p2,p3,p4,p5 , ncol=2)
-names(ghg)
 
 
 
@@ -138,29 +127,25 @@ names(ghg)
 
 ```
 
-> **Tip**: Make sure that you leave a blank line between the start / end of
-each code block and the end / start of your Markdown text so that it is
-formatted nicely in the knitted text. Note as well that text on consecutive
-lines is treated as a single space. Make sure you have a blank line between
-your paragraphs so that they too are formatted for easy readability.
+> Univariate Findings
 
 # Univariate Analysis
 
-> **Tip**: Now that you've completed your univariate explorations, it's time to
-reflect on and summarize what you've found. Use the questions below to help you
-gather your observations and add your own if you have other thoughts!
 
 ### What is the structure of your dataset?
-The data set contains 4324 obs over 22 variables . Dataset gives info of majoe green house gasses and thier sources . 
+The data set contains 4324 obs over 22 variables . Dataset gives info of major green house gasses and thier sources . 
 
 ### What is/are the main feature(s) of interest in your dataset?
+
 The sources as well as the the total emmisions are given and hence contribution of each sector on total emmision.
 
-### What other features in the dataset do you think will help support your \
-investigation into your feature(s) of interest?
+### What other features in the dataset do you think will help support your \investigation into your feature(s) of interest?
+
+Distribution of data over the years . or groping them by countries / continents to compare distributions.  
 
 ### Did you create any new variables from existing variables in the dataset?
 No 
+
 ### Of the features you investigated, were there any unusual distributions? \
 Did you perform any operations on the data to tidy, adjust, or change the form \
 of the data? If so, why did you do this?
@@ -169,14 +154,9 @@ No changes  were done to the data as it was clean and ready to use
 
 # Bivariate Plots Section
 
-> **Tip**: Based on what you saw in the univariate plots, what relationships
-between variables might be interesting to look at in this section? Don't limit
-yourself to relationships between a main output feature and one of the
-supporting variables. Try to look at relationships between supporting variables
-as well.
 
-```{r echo=FALSE, Bivariate_Plots}
-names(ghg)
+```{r echo=FALSE, warning=FALSE , Bivariate_Plots}
+
 color.sub<- c( 'China' , 'Japan' , 'Bangladesh' , 'Pakistan' , 'India' , 'Afghanistan')
 color.sub2<- c( 'China' , 'India' )
 ghg1 <- subset (ghg, (ghg$Country == 'India' | ghg$Country == 'China' | ghg$Country == 'Japan'))
@@ -185,7 +165,121 @@ ghg1 <- subset (ghg, (ghg$Country == 'India' | ghg$Country == 'China' | ghg$Coun
 ggplot(aes(x=Total.CO2.land , y=TotalGHG ), data = ghg) +
   geom_line()
 
+
+# ggpairs of selected country data only to display scatterplot matrix
+suppressWarnings(ggpairs(ghg1 , cardinality_threshold = 188  , upper = 'blank'))
+
+
+
+
+
+
+```
+
+
+##almost linear relation ship between land + CH4 emmision and CH4 emmision but still there are some instances where CH4+ land is more than CH4
+
+```{r echo = FALSE}
+
+ggplot(aes(x=TotalCH4 , TotalCH4.land  ) , data = ghg) + 
+  geom_point()+ 
+  scale_x_continuous(breaks = seq(0,200,100) , limits = c(0,200)) +
+  scale_y_continuous(breaks = seq(0,200,100) , limits = c(0,200))
+
+
+```
+
+###for most part japan's Emmision due to  energy production is 1000 which is far lower to China which Goes as far as about 9,000 Mn tonnes !!!!
+
+```{r echo = FALSE}
+qplot(x= Energy , y = ..count.. / sum(..count..) , data = ghg1 , xlab = 'Energy Emission' , ylab = 'count density'  , geom = 'freqpoly' , color = Country ) +
+  scale_x_continuous( breaks = seq(0,1000,10)) +
+  scale_x_log10()
+
+summary(ghg1)
+
+```
+
+
+
+```{r echo = FALSE}
+
+ggplot(aes(x=Total.CO2.land , y = TotalCO2.land  ) , data = ghg) + 
+  geom_point()+ 
+  scale_x_continuous(breaks = seq(0,400,100) , limits = c(0,400)) +
+  scale_y_continuous(breaks = seq(0,300,100) , limits = c(0,300))+
+  stat_smooth(method = "lm")
+
+ggplot(aes(x=TotalN2O , y = TotalN2O.land ) , data = ghg) + 
+  geom_point()+ 
+  scale_x_continuous(breaks = seq(0,400,100) , limits = c(0,400)) +
+  scale_y_continuous(breaks = seq(0,300,100) , limits = c(0,300))+
+  stat_smooth(method = "lm")
+
+
+
+
+
+
+#names(ghg)
+
+```
+
+
+# Bivariate Analysis
+
+>  Summarization - The variable are highly co-related and shows linear trend which is to be expected as all the date is about ghgs hence Year vs variable plots are taken up for analysis to produce meaningful plots
+
+
+### Talk about some of the relationships you observed in this part of the \investigation. How did the feature(s) of interest vary with other features in \the dataset?
+The features like Industrial emmision , Agriculture Emmision tend to increase over the years not much seasonality is seen the trend of emission of most variables are on the increasing side along the years.
+
+
+
+### Did you observe any interesting relationships between the other features \(not the main feature(s) of interest)?
+
+Relationship between land + CO2 emmision and CO2 emmision is more varied though a bit of linear trend could be seen but it is not as linear as CH4 Also N20 too doesnot show much daviation this could be either because Co2 has varied sources that effects its emmision and though land does effect Co2 but the effect is not purely linear .
+
+### What was the strongest relationship you found?
+
+Most of  relation ships are strong as the whole data set has data of Green house gasses
+
+
+# Multivariate Plots Section
+
+```{r echo=FALSE}
+ghg2 <-ghg1
+ggplot(aes(x = Country, y = TotalGHG),data = ghg1) +
+  geom_boxplot() +
+  stat_summary( fun.y = mean , geom = 'point' , shape =8)
+
+
+ghgx<-ghg
+ghgx$year_bucket <- cut (ghg$Year , c(1990 ,2000 , 2012 ))
+table(ghgx$year_bucket, useNA = 'ifany')
+```
+
+###the points disply huge disparity b/w some of the observation  but the genral trend is exponential increse of industrial emminsion in comparison with Agrical emminsion over the years.
+
+```{r echo=FALSE}
+ggplot(aes(x= Agriculture , y= Industrial) ,
+       data = subset(ghgx , !is.na(year_bucket))) +
+  geom_point(aes(color = year_bucket) )
+
+ggplot(aes(x= TotalGHG , y= Country) ,
+       data = subset(ghgx , !is.na(year_bucket) & ghg$Country == 'India' | ghg$Country == 'China' | ghg$Country == 'Japan')) +
+  geom_line(aes(color = year_bucket) )
+
+
+
+```
+
+
 #PLOTTING ALL THE GASSES COUNTRY WISE USING GRIDEXTRA.gridarrange
+
+```{r echo=FALSE}
+
+
 
 px <- ggplot(aes(x=Year , y= TotalGHG ,color = Country ),
              data = ghg1) +
@@ -206,11 +300,6 @@ pa <- ggplot(aes(x=Year , y= TotalN2O ,color = Country ),
 
 grid.arrange(px,py,pz,pa ,ncol=1)
 
-# ggpairs of selected country data only to display scatterplot matrix
-suppressWarnings(ggpairs(ghg1 , cardinality_threshold = 188))
-
-
-
 
 
 
@@ -218,89 +307,87 @@ suppressWarnings(ggpairs(ghg1 , cardinality_threshold = 188))
 
 ```
 
-```{r echo=False}
+###PLOTTING ALL THE indutry  emmision COUNTRY WISE USING GRIDEXTRA.gridarrange
+
+```{r echo=FALSE}
+
+#PLOTTING ALL THE indutry  emmision COUNTRY WISE USING GRIDEXTRA.gridarrange
+pl1 <- ggplot(aes(x=Year , y= Industrial ,color = Country ),
+             data = ghg1) +
+  geom_line()+ ylab('Industrial')
 
 
 
+pl2 <- ggplot(aes(x=Year , y= Waste,
+                 color = Country ), data = ghg1) +
+  geom_line()+
+  ylab('waste')
 
+pl3 <- ggplot(aes(x=Year , y= Agriculture ,color = Country ),
+             data = ghg1) +geom_line()+ ylab('Agri')
+
+pl4 <- ggplot(aes(x=Year , y= Energy ,color = Country ), 
+             data = ghg1) +geom_line()+ ylab('ENERGY')
+
+
+
+pl5 <- ggplot(aes(x=Year , y= Manufacturing ,color = Country ), 
+             data = ghg1) +geom_line()+ ylab('Manufacturing')
+
+
+pl6 <- ggplot(aes(x=Year , y=Transportation  ,color = Country ), 
+             data = ghg1) +geom_line()+ ylab('Transport')
+lay <- rbind(c(1,1,1,2,2),
+             c(1,1,1,2,2),
+             c(1,1,1,2,2),
+             c(3,3,3,4,4),
+             c(3,3,3,4,4),
+             c(5,5,5,6,6),
+             c(5,5,5,6,6)
+             )
+
+grid.arrange(pl1,pl2,pl3,pl4,pl5,pl6 , ncol=1 , layout_matrix = lay)
 ```
 
 
-# Bivariate Analysis
+###heat map
 
-> **Tip**: As before, summarize what you found in your bivariate explorations
-here. Use the questions below to guide your discussion.
-
-### Talk about some of the relationships you observed in this part of the \
-investigation. How did the feature(s) of interest vary with other features in \
-the dataset?
-
-### Did you observe any interesting relationships between the other features \
-(not the main feature(s) of interest)?
-
-### What was the strongest relationship you found?
-
-
-# Multivariate Plots Section
-
-> **Tip**: Now it's time to put everything together. Based on what you found in
-the bivariate plots section, create a few multivariate plots to investigate
-more complex interactions between variables. Make sure that the plots that you
-create here are justified by the plots you explored in the previous section. If
-you plan on creating any mathematical models, this is the section where you
-will do that.
 
 ```{r echo=FALSE, Multivariate_Plots}
+#heat map
+
+ghg_heat_map <-subset(ghg , select = c( "Energy" , "Industrial" ,"Agriculture","Waste" ,             "Land.Use" , "Electricity.Heat" ,"Manufacturing" , "Transportation" , "FugitiveEmissions" ))
+colnames(ghg_heat_map) <- c(1:9)
+
+summary(ghg_heat_map)
+dim(ghg_heat_map)
+View(ghg_heat_map)
+Long.2 <- melt(as.matrix(ghg_heat_map[24:92,]))
+
+names(Long.2) <- c("countryYP", "v2", "value")
+
+#HEAT MAP
+ggplot(aes(y = countryYP, x = v2, fill = value),
+  data = Long.2) +
+  geom_tile() +
+  scale_fill_gradientn(colours = colorRampPalette(c("blue", "red"))(100))
+
+
+
+
 
 ```
+
+
 
 # Multivariate Analysis
 
-### Talk about some of the relationships you observed in this part of the \
-investigation. Were there features that strengthened each other in terms of \
-looking at your feature(s) of interest?
+### Talk about some of the relationships you observed in this part of the \investigation. Were there features that strengthened each other in terms of \looking at your feature(s) of interest?
+China is mostly at the top for most variables / Analysis for emmision of variables . The trend is in the Increasing direction mostly but Japan is showing a decreasing trend over the years this might be due to technogical advancements or better management
 
 ### Were there any interesting or surprising interactions between features?
+Green house gas emmision is a global phenomenon and the presence of green house gasses produced by industries are  increasing in many cases this was true as in cases of India and China but japan showed signs of decres too in certain sectors. 
 
-### OPTIONAL: Did you create any models with your dataset? Discuss the \
-strengths and limitations of your model.
-
-------
-
-# Final Plots and Summary
-
-> **Tip**: You've done a lot of exploration and have built up an understanding
-of the structure of and relationships between the variables in your dataset.
-Here, you will select three plots from all of your previous exploration to
-present here as a summary of some of your most interesting findings. Make sure
-that you have refined your selected plots for good titling, axis labels (with
-units), and good aesthetic choices (e.g. color, transparency). After each plot,
-make sure you justify why you chose each plot by describing what it shows.
-
-### Plot One
-```{r echo=FALSE, Plot_One}
-
-```
-
-### Description One
-
-
-### Plot Two
-```{r echo=FALSE, Plot_Two}
-
-```
-
-### Description Two
-
-
-### Plot Three
-```{r echo=FALSE, Plot_Three}
-
-```
-
-### Description Three
-
-------
 #MODELING USING ARIMA MODEL
 ```{r echo = FALSE , model_arima}
 #Arima time series
@@ -402,7 +489,7 @@ plot(fcast)
 
 ```{r echo=FALSE}
 
-hold <- window(ts(deseasonal_ghg), start=1990)
+hold <- window(ts(deseasonal_ghg), start=2)
 deseasonal_ghg
 hold
 fit_holdout <- arima(ts(deseasonal_ghg[-c(700:725)]), order=c(1,1,7))
@@ -410,7 +497,7 @@ fit_holdout <- arima(ts(deseasonal_ghg[-c(700:725)]), order=c(1,1,7))
 fcast_holdout <- forecast(fit_holdout,h=15)
 
 fcast_holdout
-plot(x=fcast_holdout, main=" ")
+plot(x=fcast_holdout, main="Pridicting future values using forecast")
 
 
 fit_seasonality = auto.arima(deseasonal_ghg, seasonal=TRUE)
@@ -420,13 +507,71 @@ plot(fcast_s)
 
 ```
 
+### OPTIONAL: Did you create any models with your dataset? Discuss the \strengths and limitations of your model.
+
+ARIMA (Autoregressive integrated moving average) is very widely used model time series analysis this model Also the Data was Non-seasonal in nature so non seasonal - Arima(p,d,q) model was used.
+The model is built on a single variable to analyze its future values by using previous values .
+The optimal model was found out to be ARIMA(1,1,6) [AR=1 , I=1 , MA=6] .
+
+####STRENGTH-
+Optimal for Univariate forecast of a Time series data
+Uses lags(previous values) to help possible predict future values
+80% confidence limits shaded in darker blue, and 95% in lighter blue.
+
+
+####WEAKNESS-
+The forecast broadens and becomes less relaible as time increase
+
+ 
+------
+
+# Final Plots and Summary
+
+
+### Plot One
+```{r echo=FALSE, Plot_One}
+ggplot(aes(x= TotalGHG , y= Country) ,
+       data = subset(ghgx , !is.na(year_bucket) & ghg$Country == 'India' | ghg$Country == 'China' | ghg$Country == 'Japan')) +
+  geom_line(aes(color = year_bucket) )
+
+
+```
+
+### Description One
+
+This plot groups data for some of the countries and compares thier Total GHG emmision this plot shows the huge disparitries of emmision b/w China and others What china used to produce in the past 1990-2010 is what Developing Country like India is producing in 2000-2010 .()
+
+### Plot Two
+```{r echo=FALSE, Plot_Two}
+
+
+grid.arrange(pl1,pl2,pl3,pl4,pl5,pl6 , ncol=1 , layout_matrix = lay)
+
+```
+
+### Description Two
+The plot dipicts the trend followed by  some of the countries over the years in diffrent fields such as Transport , Manufacturing etc .China is mostly at the to in Emmision . The trend is in the Increasing direction mostly but Japan is showing a decreasing trend in variables such as Transport emmision , Emmision due to waste which is very rare given this dataset.
+
+
+### Plot Three
+```{r echo=FALSE, Plot_Three}
+plot(x=fcast_holdout, main="Pridicting future values using forecast")
+
+
+```
+
+### Description Three
+Forecast of timeseries data of India pridicting  next 15 values for total ghg emissions. 
+80% confidence limits shaded in darker blue, and 95% in lighter blue. Longer term forecasts will usually have more uncertainty, as the model gives further future values it will become more and more uncertain this could be seen as the  spread increases along the xaxis(time)
+
+------
 
 # Reflection
 
-> **Tip**: Here's the final step! Reflect on the exploration you performed and
-the insights you found. What were some of the struggles that you went through?
-What went well? What was surprising? Make sure you include an insight into
-future work that could be done with the dataset.
+>Green House Gases are the major factors in promoting Global warming and is a global threat .Mostly Univariate Analysis was only useful for finding the nature and distribution of data not much Could be drawn out from it . Bivariate analysis helped in identifieng the anomalities / diffrent patterns in the Data This was very Useful as the data was highly corelated and it would mostly be a increasing linear Trend. Finnaly The Multivariate Analysis brought about some meaningful analytics and some infrences Could be drawn from it.
+Time series Data was bit diffrent Than a Normal Data and hence modeling it was a chalange at first but with the right model it was very effect to Analayze and produce prictions for this Data 
+The huge diffrences in emmision of countries like Japan And China Were Note worthy Though they also have diffrence in Population and Land-Mass But Japan had a significantly more GDP Percapita Than China.  
+The Analysis of of Emmisions with Various Economic and social parametres could be done to produce more insights . 
 
-> **Tip**: Don't forget to remove this, and the other **Tip** sections before
-saving your final work and knitting the final report!
+
+
