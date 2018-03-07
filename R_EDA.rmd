@@ -5,8 +5,10 @@
 ========================================================
 
 > Resources -  
-http://datasets.wri.org/dataset/cait-country (for data set)
-www.datascience.com
+
+### http://datasets.wri.org/dataset/cait-country (for data set)
+
+### www.datascience.com
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
 # Load all of the packages that you end up using in your analysis in this code
@@ -43,13 +45,14 @@ library(dplyr)
 
 >Data overveiw/ summary
 
-```{r echo=FALSE, Load_the_Data}
+```{r echo=FALSE, message=FALSE, warning=FALSE ,  Load_the_Data}
 # Load the Data
 
 
 ghg <- read.csv("GHG.csv" , sep = ",")
 
 summary(ghg)
+#getwd()
 
 ```
 
@@ -59,44 +62,101 @@ summary(ghg)
 > CAIT data set of global Green house gas emmision is acquired from - 
 http://datasets.wri.org/dataset/cait-country .The CAIT Country GHG emissions collection applies a consistent methodology to create a six-gas, multi-sector, and internationally comparable data set for 186 countries.
 
+>DATA names with its Units
+ "Country" -Name of the countries   
+ "Year"- year The data is for               
+ "TotalGHG"- in Metric Tonnes         
+ "Total.GHG.land"- in Metric Tonnes   
+ "Total.CO2.land"- in Metric Tonnes   
+ "TotalCH4"- in Metric Tonnes         
+ "TotalN2O"- in Metric Tonnes          
+ "TotalF.Gas"- in Metric Tonnes       
+ "TotalCO2.land"- in Metric Tonnes    
+ "TotalCH4.land"- in Metric Tonnes     
+ "TotalN2O.land"- in Metric Tonnes     
+ "Energy"- in Metric Tonnes           
+ "Industrial"- in Metric Tonnes        
+ "Agriculture"- in Metric Tonnes       
+ "Waste"- in Metric Tonnes            
+ "Land.Use" - in Metric Tonnes         
+ "BunkerFuels"- in Metric Tonnes       
+ "Electricity.Heat" - in Metric Tonnes
+ "Manufacturing"- in Metric Tonnes     
+ "Transportation"- in Metric Tonnes   
+ "OtherFuel"- in Metric Tonnes        
+ "FugitiveEmissions"- in Metric Tonnes
+
+
 
 # Univariate Plots Section
 
 > All the univariate plots are here.
 
-```{r echo=FALSE, Univariate_Plots}
-names(ghg)
+A simple histogram dipicting TotalGHG distribution (it shows that most of the countries over the year has very less emmision also that there are more emission by certain coutries over the year other than this not much can be drawn out) 
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots}
+
 # A simple histogram dipicting TotalGHG distribution (it shows that most of the countries over the year has very less emmision also that there are more emission by certain coutries over the year other than this not much can be drawn out) 
+
+
 qplot(x=TotalGHG ,data = ghg ) +
   scale_x_continuous(limits = c(0,1000) , breaks = seq(0,1000,100)) +
   scale_y_sqrt()
 
 
-#produces histograms of count(here no. countries with GHG Emmision for each year seperatly)
-qplot(x=TotalGHG,data = ghg ,ylab = 'NumberOfCountries', color = I('cyan') , fill= I('green')  )+
+```
+
+produces histograms of count(here no. countries with GHG Emmision for each year seperatly)
+
+```{r echo=FALSE, message=FALSE, warning=FALSE , fig.width = 15}
+
+#to know About distribution and trend over the years of Total GHG emmission (Total GHG is taken as one of the mai features)
+
+qplot(x=TotalGHG,data = ghg ,ylab = 'NumberOfCountries', color = I('cyan'),
+      fill= I('green')  )+
   scale_x_continuous(limits = c(100,1000) , breaks = seq(100,1000,100))+
   facet_wrap(~Year)
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE , fig.width=15}
 
 qplot(x=TotalCH4 , data = ghg ,ylab = 'NumberOfCountries'  )+
   scale_x_continuous(limits = c(100,1000) , breaks = seq(100,1000,100))+
   facet_wrap(~Year)
-#log trans for normal distribution
+
+```
+
+log trans to check for normal distribution
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+#it is found out to be a bimodal normal distribution
 qplot(x=TotalGHG ,data = ghg , color = I('cyan') , fill= I('red') ) +
   scale_x_continuous(limits = c(0,1000) , breaks = seq(0,1000,100))+
   scale_x_log10()
-  
 
-#summary(ghg$Industrial.Processes..MtCO2e.)
+```
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE , fig.width= 15}
+
+
 qplot(x= Industrial ,data = ghg , color = I('cyan') , fill= I('red') ) +
   scale_x_continuous(limits = c(0,400) , breaks = seq(0,400,400))+
   scale_y_continuous(limits = c(0,20) , breaks = seq(0,50,10)) +
   facet_grid(~Year , space ='free_x' , scales = 'free_x')
 
+```
 
-# GHG PRODUCTION FROM DIFFRENT SOURCES and plotting side by side using grid arrange
+ GHG PRODUCTION FROM DIFFRENT SOURCES and plotting side by side using grid arrange
 
-p1 <-qplot(x= Industrial ,data = ghg 
-           , color = I('cyan') , fill= I('red') ) +
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+p1 <-qplot(x= Industrial ,data = ghg ,
+           color = I('cyan') , fill= I('red') ) +
   scale_x_continuous(limits = c(0,400) , breaks = seq(0,500,200))+
   scale_y_continuous(limits = c(0,20) , breaks = seq(0,50,10)) 
 
@@ -157,18 +217,23 @@ No changes  were done to the data as it was clean and ready to use
 # Bivariate Plots Section
 
 
-```{r echo=FALSE, warning=FALSE , Bivariate_Plots}
+```{r echo=FALSE , message=FALSE, warning=FALSE , Bivariate_Plots}
 
 color.sub<- c( 'China' , 'Japan' , 'Bangladesh' , 'Pakistan' , 'India' , 'Afghanistan')
 color.sub2<- c( 'China' , 'India' )
-ghg1 <- subset (ghg, (ghg$Country == 'India' | ghg$Country == 'China' | ghg$Country == 'Japan'))
+ghg1 <- subset (ghg, (ghg$Country == 'India' | ghg$Country == 'China' 
+                      | ghg$Country == 'Japan'))
 
 
 ggplot(aes(x=Total.CO2.land , y=TotalGHG ), data = ghg) +
   geom_line()
 
+```
 
-# ggpairs of selected country data only to display scatterplot matrix
+ ggpairs of selected country data only to display scatterplot matrix
+
+```{r echo=FALSE, message=FALSE, warning=FALSE , fig.height= 12 , fig.width=15}
+
 suppressWarnings(ggpairs(ghg1 , cardinality_threshold = 188  , upper = 'blank'))
 
 
@@ -179,22 +244,26 @@ suppressWarnings(ggpairs(ghg1 , cardinality_threshold = 188  , upper = 'blank'))
 ```
 
 
-##almost linear relation ship between land + CH4 emmision and CH4 emmision but still there are some instances where CH4+ land is more than CH4
+ Almost linear relation ship between land + CH4 emmision and CH4 emmision but still there are some instances where CH4+ land is more than CH4
 
-```{r echo = FALSE}
+```{r echo = FALSE ,message=FALSE, warning=FALSE}
 
 ggplot(aes(x=TotalCH4 , TotalCH4.land  ) , data = ghg) + 
   geom_point()+ 
   scale_x_continuous(breaks = seq(0,200,100) , limits = c(0,200)) +
-  scale_y_continuous(breaks = seq(0,200,100) , limits = c(0,200))
+  scale_y_continuous(breaks = seq(0,200,100) , limits = c(0,200))+
+  stat_smooth(method = "lm")
+
 
 
 ```
 
-###for most part japan's Emmision due to  energy production is 1000 which is far lower to China which Goes as far as about 9,000 Mn tonnes !!!!
+ For most part japan's Emmision due to  energy production is 1000 which is far lower to China which Goes as far as about 9,000 Metric tonnes !!!!
 
-```{r echo = FALSE}
-qplot(x= Energy , y = ..count.. / sum(..count..) , data = ghg1 , xlab = 'Energy Emission' , ylab = 'count density'  , geom = 'freqpoly' , color = Country ) +
+```{r echo = FALSE , message=FALSE, warning=FALSE}
+qplot(x= Energy , y = ..count.. / sum(..count..) , data = ghg1 ,
+      xlab = 'Energy Emission' , ylab = 'count density'  , geom = 'freqpoly' , 
+      color = Country ) +
   scale_x_continuous( breaks = seq(0,1000,10)) +
   scale_x_log10()
 
@@ -203,8 +272,9 @@ summary(ghg1)
 ```
 
 
+Relationship between land + CO2 emmision and CO2 emmision is more varied though a bit of linear trend could be seen but it is not as linear as CH4 or N2O but rather it more spread around mean
 
-```{r echo = FALSE}
+```{r echo = FALSE ,message=FALSE, warning=FALSE}
 
 ggplot(aes(x=Total.CO2.land , y = TotalCO2.land  ) , data = ghg) + 
   geom_point()+ 
@@ -249,37 +319,47 @@ Most of  relation ships are strong as the whole data set has data of Green house
 
 # Multivariate Plots Section
 
-```{r echo=FALSE}
+```{r echo=FALSE , message=FALSE, warning=FALSE}
 ghg2 <-ghg1
 ggplot(aes(x = Country, y = TotalGHG),data = ghg1) +
   geom_boxplot() +
   stat_summary( fun.y = mean , geom = 'point' , shape =8)
 
 
-ghgx<-ghg
-ghgx$year_bucket <- cut (ghg$Year , c(1990 ,2000 , 2012 ))
-table(ghgx$year_bucket, useNA = 'ifany')
+
+ghga <- subset(ghg ,   ghg$Country == 'India' |
+                       ghg$Country == 'China' | ghg$Country == 'Japan')
+ghga$year_bucket <- cut (ghga$Year , c(1990 ,1995 , 2000,2005 ,2012 ))
+table(ghga$year_bucket, useNA = 'ifany')
+
+
+ghga <- na.omit(ghga)
+
 ```
 
-###the points disply huge disparity b/w some of the observation  but the genral trend is exponential increse of industrial emminsion in comparison with Agrical emminsion over the years.
+The points disply huge disparity b/w some of the observation  but the genral trend is exponential increse of industrial emminsion in comparison with Agricultral emminsion over the years.
 
-```{r echo=FALSE}
+```{r echo=FALSE , message=FALSE, warning=FALSE}
+
+
 ggplot(aes(x= Agriculture , y= Industrial) ,
-       data = subset(ghgx , !is.na(year_bucket))) +
-  geom_point(aes(color = year_bucket) )
+       data = ghga) +
+  geom_line(aes(color = year_bucket) )
 
-ggplot(aes(x= TotalGHG , y= Country) ,
-       data = subset(ghgx , !is.na(year_bucket) & ghg$Country == 'India' | ghg$Country == 'China' | ghg$Country == 'Japan')) +
+ggplot(aes(x= TotalGHG , y= Country ) ,
+       data = ghga)+
   geom_line(aes(color = year_bucket) )
 
 
 
 ```
 
+Emmision produced bu countries the trend is increasing  also ,Japan Emmsions are very punitive in comparison to China or india .the Graph is diffucult to understand as is and hence is updated to show the results clearly in "Final plot 1". 
 
-#PLOTTING ALL THE GASSES COUNTRY WISE USING GRIDEXTRA.gridarrange
 
-```{r echo=FALSE}
+PLOTTING ALL THE GASSES COUNTRY WISE USING GRIDEXTRA.gridarrange
+
+```{r echo=FALSE , message=FALSE, warning=FALSE}
 
 
 
@@ -309,9 +389,9 @@ grid.arrange(px,py,pz,pa ,ncol=1)
 
 ```
 
-###PLOTTING ALL THE indutry  emmision COUNTRY WISE USING GRIDEXTRA.gridarrange
+ PLOTTING ALL THE indutry  emmision COUNTRY WISE USING GRIDEXTRA.gridarrange
 
-```{r echo=FALSE}
+```{r echo=FALSE ,message=FALSE, warning=FALSE}
 
 #PLOTTING ALL THE indutry  emmision COUNTRY WISE USING GRIDEXTRA.gridarrange
 pl1 <- ggplot(aes(x=Year , y= Industrial ,color = Country ),
@@ -352,13 +432,16 @@ grid.arrange(pl1,pl2,pl3,pl4,pl5,pl6 , ncol=1 , layout_matrix = lay)
 ```
 
 
-###heat map
+ Heat map
 
 
-```{r echo=FALSE, Multivariate_Plots}
+```{r echo=FALSE, message=FALSE, warning=FALSE , Multivariate_Plots}
 #heat map
 
-ghg_heat_map <-subset(ghg , select = c( "Energy" , "Industrial" ,"Agriculture","Waste" ,             "Land.Use" , "Electricity.Heat" ,"Manufacturing" , "Transportation" , "FugitiveEmissions" ))
+ghg_heat_map <-subset(ghg , select = c( "Energy" , "Industrial" ,
+                                        "Agriculture","Waste" ,"Land.Use" ,
+                                        "Electricity.Heat" ,"Manufacturing" ,
+                                        "Transportation" , "FugitiveEmissions"))
 colnames(ghg_heat_map) <- c(1:9)
 
 summary(ghg_heat_map)
@@ -391,7 +474,7 @@ China is mostly at the top for most variables / Analysis for emmision of variabl
 Green house gas emmision is a global phenomenon and the presence of green house gasses produced by industries are  increasing in many cases this was true as in cases of India and China but japan showed signs of decres too in certain sectors. 
 
 #MODELING USING ARIMA MODEL
-```{r echo = FALSE , model_arima}
+```{r echo = FALSE, message=FALSE, warning=FALSE , model_arima}
 #Arima time series
 sub1 <-subset(ghg,ghg$Country == 'India' )
 subt <- subset(sub1,select = c( 'Year' ) )
@@ -401,7 +484,8 @@ sub <- ts(subset(sub1,select = c('TotalGHG'  ) ))
 subt$cleanTghg <- tsclean(sub)
 
 ggplot() +
-  geom_line(data = subt, aes(x = Year, y = cleanTghg)) + ylab('Cleaned TOTAL GHG')
+  geom_line(data = subt, aes(x = Year, y = cleanTghg)) + 
+  ylab('Cleaned TOTAL GHG')
 
 
 
@@ -411,9 +495,9 @@ ggplot() +
 
 ```
 
-###Calculating moving averages and ploting it
+ Calculating moving averages and ploting it
 
-```{r echo=FALSE}
+```{r echo=FALSE , message=FALSE, warning=FALSE}
 
 
 subt$ghg_ma5 <- ma(subt$cleanTghg, order=5) #ma= moving average   5 years
@@ -422,22 +506,24 @@ summary(subt$ghg_ma5)
 summary(subt$ghg_ma10)
 ggplot() +
   geom_line(data = subt, aes(x = Year, y =cleanTghg , colour = "Totalghg")) +
-  geom_line(data = subt, aes(x = Year, y = subt$ghg_ma5,   colour = "Moving Average for 5 years"))  +
-  geom_line(data = subt, aes(x = Year, y = subt$ghg_ma5, colour = " Moving Average for 10 years"))  +
-  ylab('GHG ')  #not much variation is seen here
-#DECOMPOSITION
-#TREND THE GHG emmision follows a increasing pattern overtime
-#Seasonality yearly data no seasonality here  
-#finding residua/error
+  geom_line(data = subt, aes(x = Year, y = subt$ghg_ma5,   
+                             colour = "Moving Average for 5 years"))+
+  geom_line(data = subt, aes(x = Year, y = subt$ghg_ma5, 
+                             colour = " Moving Average for 10 years"))+
+  ylab('GHG ')  
+
+
+
 
 ```
-### Not much variation is seen here
 
-### DECOMPOSITION
+ Not much variation is seen here
 
-### TREND THE GHG emmision follows a increasing pattern overtime
+ DECOMPOSITION
 
-### Seasonality yearly data no seasonality here  
+ TREND THE GHG emmision follows a increasing pattern overtime
+
+ Seasonality yearly data no seasonality here  
 
 
 ```{r echo = TRUE}
@@ -467,7 +553,7 @@ Pacf(tghg_ma, main='')
 ```
 
 
-### Creating models to find best fit
+ Creating models to find best fit
 
 ```{r echo =TRUE}
 m1 <- auto.arima(deseasonal_ghg, seasonal=FALSE)
@@ -487,7 +573,7 @@ fcast <- forecast(m2, h=15)
 plot(fcast)
 ```
 
-###  HOLDING VALUES AND INTRODUCING SEASONALITY
+  HOLDING VALUES AND INTRODUCING SEASONALITY
 
 ```{r echo=FALSE}
 
@@ -509,7 +595,8 @@ plot(fcast_s)
 
 ```
 
-### OPTIONAL: Did you create any models with your dataset? Discuss the \strengths and limitations of your model.
+### OPTIONAL: Did you create any models with your dataset? 
+Discuss the \strengths and limitations of your model.
 
 ARIMA (Autoregressive integrated moving average) is very widely used model time series analysis this model Also the Data was Non-seasonal in nature so non seasonal - Arima(p,d,q) model was used.
 The model is built on a single variable to analyze its future values by using previous values .
@@ -532,23 +619,28 @@ The forecast broadens and becomes less relaible as time increase
 
 ### Plot One
 ```{r echo=FALSE, Plot_One}
-ggplot(aes(x= TotalGHG , y= Country) ,
-       data = subset(ghgx , !is.na(year_bucket) & ghg$Country == 'India' | ghg$Country == 'China' | ghg$Country == 'Japan')) +
-  geom_line(aes(color = year_bucket) )
+
+
+
+ggplot(aes(y= TotalGHG , x= year_bucket) ,
+       data = ghga ) +
+  geom_boxplot(aes(color = Country) )
 
 
 ```
 
 ### Description One
 
-This plot groups data for some of the countries and compares thier Total GHG emmision this plot shows the huge disparitries of emmision b/w China and others What china used to produce in the past 1990-2010 is what Developing Country like India is producing in 2000-2010 .()
+This plot groups data for some of the countries and compares thier Total GHG emmision this plot shows the huge disparitries of emmision b/w China and others. Japan is not showing any significant increase in emmision and its gg emmision in comparison to China and india is almost negligible india on the other hand is observing a stedy increase in emmision over the years.  
 
 ### Plot Two
 ```{r echo=FALSE, Plot_Two}
 
 
-grid.arrange(pl1,pl2,pl3,pl4,pl5,pl6 , ncol=1 , layout_matrix = lay)
-
+grid.arrange(arrangeGrob(pl1,pl2,pl3,pl4,pl5,pl6 , 
+                         top = "Sectors VS Year comparison for some Countries", 
+                         layout_matrix = lay) , ncol=1  )
+  
 ```
 
 ### Description Two
@@ -557,7 +649,8 @@ The plot dipicts the trend followed by  some of the countries over the years in 
 
 ### Plot Three
 ```{r echo=FALSE, Plot_Three}
-plot(x=fcast_holdout, main="Pridicting future values using forecast")
+plot(x=fcast_holdout, main="Pridicting future values using forecast" , xlab = 'year[1 corresponds to 1990 and so on]' , ylab = 'TotalGHG Emmision')
+ 
 
 
 ```
