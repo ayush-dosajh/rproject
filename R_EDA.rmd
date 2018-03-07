@@ -333,32 +333,39 @@ ghga <- subset(ghg ,   ghg$Country == 'India' |
 ghga$year_bucket <- cut (ghga$Year , c(1990 ,1995 , 2000,2005 ,2012 ))
 table(ghga$year_bucket, useNA = 'ifany')
 
+ghga$year_bucket_b <- cut (ghga$Year ,c(1990 ,1992 , 1994 , 1996 , 1998 ,2000 ,
+                                        2002 , 2004, 2006 , 2008 , 2010 , 2012 ))
+table(ghga$year_bucket_b, useNA = 'ifany')
+
+
 
 ghga <- na.omit(ghga)
 
 ```
 
-The points disply huge disparity b/w some of the observation  but the genral trend is exponential increse of industrial emminsion in comparison with Agricultral emminsion over the years.
+The graph display huge disparity b/w some of the observation (countries)  
 
-```{r echo=FALSE , message=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, warning=FALSE , fig.width = 15}
 
+ggplot(aes(x= year_bucket_b, y=Agriculture, fill = Country) ,
+       data = ghga )+
+  geom_bar(position="dodge", stat="identity")
 
-ggplot(aes(x= Agriculture , y= Industrial) ,
-       data = ghga) +
-  geom_line(aes(color = year_bucket) )
-
-ggplot(aes(x= TotalGHG , y= Country ) ,
-       data = ghga)+
-  geom_line(aes(color = year_bucket) )
-
+ggplot(aes(x= year_bucket, y=TotalGHG, fill = Country) ,
+       data = ghga )+
+  geom_bar(position="dodge", stat="identity")
 
 
 ```
 
-Emmision produced bu countries the trend is increasing  also ,Japan Emmsions are very punitive in comparison to China or india .the Graph is diffucult to understand as is and hence is updated to show the results clearly in "Final plot 1". 
+Emmision produced by countries the trend is increasing  also ,Japan Emmsions are less in comparison to China or india .
+
+
+China Again is the major poluter followed by India and japan which is very low in comparison . Normally All the trends follow an increasing pattern but N20 production by china around 2010 showed a moderate decrese which is very rare for this data set, This could be due to external reasons
 
 
 PLOTTING ALL THE GASSES COUNTRY WISE USING GRIDEXTRA.gridarrange
+
 
 ```{r echo=FALSE , message=FALSE, warning=FALSE}
 
@@ -390,7 +397,9 @@ grid.arrange(px,py,pz,pa ,ncol=1)
 
 ```
 
+
  PLOTTING ALL THE indutry  emmision COUNTRY WISE USING GRIDEXTRA.gridarrange
+ The plot dipicts the trend followed by  some of the countries over the years in         diffrent fields
 
 ```{r echo=FALSE ,message=FALSE, warning=FALSE}
 
@@ -586,7 +595,7 @@ fit_holdout <- arima(ts(deseasonal_ghg[-c(700:725)]), order=c(1,1,7))
 fcast_holdout <- forecast(fit_holdout,h=15)
 
 fcast_holdout
-plot(x=fcast_holdout, main="Pridicting future values using forecast")
+plot(x=fcast_holdout, main="Predicting future values using forecast")
 
 
 fit_seasonality = auto.arima(deseasonal_ghg, seasonal=TRUE)
@@ -625,7 +634,9 @@ The forecast broadens and becomes less relaible as time increase
 
 ggplot(aes(y= TotalGHG , x= year_bucket) ,
        data = ghga ) +
-  geom_boxplot(aes(color = Country) )
+  geom_boxplot(aes(color = Country)  )+
+  ggtitle(label = 'Total green house gas emmision vs Year(in groups)
+          for some countries' , subtitle = 'in Metric Tones' )
 
 
 ```
@@ -639,9 +650,11 @@ This plot groups data for some of the countries and compares thier Total GHG emm
 
 
 grid.arrange(arrangeGrob(pl1,pl2,pl3,pl4,pl5,pl6 , 
-                         top = "Sectors VS Year comparison for some Countries", 
+                         top = "Sectors VS Year comparison for some Countries
+                         (in metric tones)", 
                          layout_matrix = lay) , ncol=1  )
-  
+                          
+?ggtitle
 ```
 
 ### Description Two
